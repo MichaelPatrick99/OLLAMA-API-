@@ -1,7 +1,44 @@
+# Core FastAPI and server dependencies
 fastapi>=0.104.0
 uvicorn>=0.23.2
+gunicorn>=21.2.0
+
+# HTTP client for Ollama API communication
 httpx>=0.25.0
+
+# Data validation and settings management
 pydantic>=2.4.2
 pydantic-settings>=2.0.3
+
+# Environment variables
 python-dotenv>=1.0.0
+
+# Database dependencies
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+alembic>=1.12.0
+
+# Authentication and security dependencies
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+cryptography>=41.0.0
+
+# Redis for session management and rate limiting (optional but recommended)
+redis>=5.0.0
+
+# Testing dependencies
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
 requests>=2.31.0
+
+# Development and code quality (optional)
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+pre-commit>=3.4.0
+
+# Additional utility dependencies
+email-validator>=2.0.0  # For email validation in Pydantic
+python-dateutil>=2.8.2  # For date handling in migrations

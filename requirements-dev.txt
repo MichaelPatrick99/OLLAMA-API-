@@ -1,0 +1,43 @@
+# Development Requirements
+# Install with: pip install -r requirements-dev.txt
+
+# Include all production requirements
+-r requirements.txt
+
+# Code formatting and linting
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+mypy>=1.5.0
+
+# Pre-commit hooks for code quality
+pre-commit>=3.4.0
+
+# Enhanced testing tools
+pytest-xdist>=3.3.0  # Parallel test execution
+pytest-mock>=3.11.0  # Mocking utilities
+pytest-benchmark>=4.0.0  # Performance testing
+coverage>=7.3.0  # Coverage reporting
+
+# Database development tools
+pgcli>=3.5.0  # Better PostgreSQL CLI
+sqlalchemy-utils>=0.41.0  # Additional SQLAlchemy utilities
+
+# Documentation tools
+mkdocs>=1.5.0
+mkdocs-material>=9.2.0
+mkdocs-swagger-ui-tag>=0.6.0
+
+# Performance and monitoring tools
+memory-profiler>=0.61.0
+py-spy>=0.3.14
+
+# API testing tools
+httpie>=3.2.0
+tavern>=2.3.0
+
+# Development utilities
+ipython>=8.15.0  # Better REPL
+rich>=13.5.0  # Beautiful terminal output
+typer>=0.9.0  # CLI tool creation
+watchdog>=3.0.0  # File watching for auto-reload
