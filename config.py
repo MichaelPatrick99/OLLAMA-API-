@@ -22,12 +22,12 @@ class Settings(BaseSettings):
     REQUEST_TIMEOUT: float = 60.0
     
     # Database settings
+    DATABASE_URL: Optional[str] = None  # Primary database URL - PRIORITIZED
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_NAME: str = "ollama_api"
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "password"
-    DATABASE_URL: Optional[str] = None  # If provided, overrides individual DB settings
     
     # Authentication settings
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -78,13 +78,6 @@ class Settings(BaseSettings):
         """Pydantic configuration."""
         env_file = ".env"
         env_file_encoding = "utf-8"
-        
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str) -> any:
-            """Parse environment variables."""
-            if field_name in ['CORS_ORIGINS', 'CORS_ALLOW_METHODS', 'CORS_ALLOW_HEADERS']:
-                return [x.strip() for x in raw_val.split(',')]
-            return cls.json_loads(raw_val)
 
 
 # Create settings instance
@@ -95,11 +88,13 @@ def get_database_url() -> str:
     """Get the complete database URL.
     
     Returns:
-        Database connection URL
+        Database connection URL (prioritizes DATABASE_URL from .env)
     """
+    # ALWAYS prioritize DATABASE_URL from environment
     if settings.DATABASE_URL:
         return settings.DATABASE_URL
     
+    # Fallback to individual settings (PostgreSQL)
     return (
         f"postgresql://{settings.DB_USER}:{settings.DB_PASSWORD}"
         f"@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"

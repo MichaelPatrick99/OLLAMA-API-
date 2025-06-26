@@ -4,22 +4,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
-import os
 
-from config import settings
+from config import get_database_url
 
-# Database URL configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    f"postgresql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
-)
+# Get database URL from configuration
+DATABASE_URL = get_database_url()
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before use
-    pool_recycle=300,    # Recycle connections every 5 minutes
-)
+# Create SQLAlchemy engine with appropriate settings
+if DATABASE_URL.startswith('sqlite'):
+    # SQLite-specific configuration
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False},  # Allow SQLite to work with FastAPI
+        echo=False  # Set to True for SQL debugging
+    )
+else:
+    # PostgreSQL configuration
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,  # Verify connections before use
+        pool_recycle=300,    # Recycle connections every 5 minutes
+    )
 
 # Create SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

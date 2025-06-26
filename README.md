@@ -1,514 +1,388 @@
-# Ollama API Wrapper with Authentication
+# 🤖 Ollama API Wrapper with Authentication
 
-A secure, production-ready FastAPI wrapper for the Ollama API featuring comprehensive authentication, role-based access control, and advanced usage analytics.
+A secure, production-ready FastAPI wrapper for the Ollama API featuring comprehensive authentication, role-based access control, and a beautiful web interface.
 
-## 🚀 Features
+## 🎯 Features
 
-### Core Functionality
-- **Text Generation**: Non-streaming and streaming text generation from prompts
-- **Chat Completion**: Conversational AI with full message history support
-- **Model Management**: Download, list, inspect, and delete Ollama models
+### 🔐 **Authentication & Security**
+- **Dual Authentication**: JWT Bearer tokens + API key authentication
+- **Role-Based Access Control**: Admin, Developer, User, and Read-Only roles
+- **Advanced Security**: Rate limiting, password requirements, secure token management
+- **Session Management**: Persistent login sessions with automatic token refresh
 
-### 🔐 Security & Authentication
-- **Dual Authentication**: JWT Bearer tokens and API key authentication
-- **Role-Based Access Control (RBAC)**: Admin, Developer, User, and Read-Only roles
-- **API Key Management**: Create, manage, and monitor API keys with usage limits
-- **Rate Limiting**: Configurable per-hour, per-day, and per-month limits
-- **Usage Tracking**: Comprehensive analytics and monitoring
+### 🌐 **Web Interface**
+- **Modern Dashboard**: Beautiful, responsive web interface
+- **Real-time Status**: Live API and Ollama connection monitoring
+- **Interactive Chat**: Full conversational AI interface
+- **API Key Management**: Create, manage, and monitor API keys
+- **Admin Panel**: User management and usage analytics
 
-### 🏗️ Architecture
-- **Production Ready**: Proper error handling, logging, and monitoring
-- **Database Integration**: PostgreSQL with SQLAlchemy ORM
-- **Middleware**: Authentication, rate limiting, and usage tracking
-- **Comprehensive Testing**: Full test suite with authentication scenarios
-- **API Documentation**: Auto-generated Swagger UI with authentication examples
+### 🚀 **API Features**
+- **Text Generation**: Single prompt text generation
+- **Chat Completion**: Multi-turn conversations with context
+- **Model Management**: List and manage Ollama models
+- **Usage Analytics**: Comprehensive request tracking and statistics
+- **Rate Limiting**: Configurable per-user rate limits
 
-## 📋 Requirements
+## 📋 System Requirements
 
-- Python 3.8+
-- PostgreSQL 12+
-- Redis 6+ (optional, for enhanced rate limiting)
-- Ollama API running locally or remotely
+- **Python**: 3.8 or higher
+- **Database**: SQLite (included) or PostgreSQL
+- **Ollama**: Latest version for AI model inference
+- **RAM**: 8GB minimum, 16GB+ recommended
+- **Storage**: 5-50GB for Ollama models
 
-## 🛠️ Installation
+## 🚀 Quick Start
 
-### 1. Clone and Setup
+### 1. Clone and Setup Environment
 
 ```bash
-# Clone the repository (or your forked version)
+# Clone the repository
 git clone <your-repo-url>
 cd ollama-api-wrapper
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create virtual environment
+python -m venv ollama-env
+source ollama-env/bin/activate  # On Windows: ollama-env\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Database Setup
-
-```bash
-# Start PostgreSQL and Redis with Docker Compose
-docker-compose up -d postgres redis
-
-# Or install locally and create database
-createdb ollama_api
-```
-
-### 3. Environment Configuration
+### 2. Configure Environment
 
 ```bash
 # Copy environment template
 cp .env.example .env
 
-# Edit .env with your settings
+# Edit configuration (use your favorite editor)
 nano .env
 ```
 
-Key environment variables:
+**Key settings to update in `.env`:**
 ```env
-# Database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/ollama_api
+# Database (SQLite is ready to use)
+DATABASE_URL=sqlite:///./ollama_api.db
 
-# Authentication
+# Authentication (⚠️ CHANGE THESE!)
 SECRET_KEY=your_super_secret_key_here
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@yourcompany.com
+ADMIN_PASSWORD=YourSecurePassword123!
 
 # Ollama API
 OLLAMA_API_BASE_URL=http://localhost:11434
-
-# Admin User (created automatically)
-ADMIN_USERNAME=admin
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=change_this_secure_password
+DEFAULT_MODEL=llama3:8b
 ```
 
-### 4. Database Migration
+### 3. Initialize Database
 
 ```bash
-# Initialize Alembic (first time only)
-alembic init migrations
-
-# Create initial migration
-alembic revision --autogenerate -m "Initial tables"
-
-# Apply migrations
+# Create database tables
 alembic upgrade head
+
+# The default admin user will be created automatically on first startup
+```
+
+### 4. Install and Start Ollama
+
+#### Windows:
+1. Download from [ollama.com](https://ollama.com/download)
+2. Install and run the installer
+3. Start Ollama:
+```powershell
+ollama serve
+```
+
+#### Download a Model:
+```bash
+# Recommended: Balanced performance model
+ollama pull llama3:8b
+
+# Or try a smaller model for testing
+ollama pull phi3:mini
 ```
 
 ### 5. Start the Application
 
 ```bash
-# Development mode
+# Start the API server
 python app.py
 
-# Production mode with Gunicorn
-gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:3000
+# The server will start on http://localhost:3000
 ```
 
-## 🔑 Authentication
-
-### User Registration & Login
+### 6. Access the Web Interface
 
 ```bash
-# Register a new user
-curl -X POST "http://localhost:3000/api/auth/register" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "developer1",
-    "email": "dev@company.com",
-    "password": "SecurePass123",
-    "full_name": "Jane Developer",
-    "role": "developer"
-  }'
+# Navigate to the frontend directory
+cd frontend
 
-# Login to get access token
+# Start the frontend server
+python -m http.server 8080
+
+# Open your browser to: http://localhost:8080
+```
+
+## 🌐 Using the Web Interface
+
+### **Login**
+- **URL**: `http://localhost:8080`
+- **Default Admin**: `admin` / `AdminPassword123!` (change this!)
+
+### **Dashboard Features**
+1. **Overview**: Account info, usage statistics, system status
+2. **API Keys**: Create and manage API keys for programmatic access
+3. **Generate**: Single-prompt text generation interface
+4. **Chat**: Interactive conversational AI
+5. **Models**: View and manage available Ollama models
+6. **Admin**: User management and system analytics (admin only)
+
+## 🔑 API Usage
+
+### **Authentication Methods**
+
+#### Method 1: JWT Token Authentication
+```bash
+# 1. Login to get token
 curl -X POST "http://localhost:3000/api/auth/login" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=developer1&password=SecurePass123"
+  -d "username=admin&password=AdminPassword123!"
+
+# Response: {"access_token": "eyJ...", "token_type": "bearer"}
+
+# 2. Use token for API calls
+curl -X POST "http://localhost:3000/api/generate" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Hello, how are you?", "model": "llama3:8b"}'
 ```
 
-### API Key Management
-
+#### Method 2: API Key Authentication
 ```bash
-# Create API key (requires authentication)
+# 1. Create API key via web interface or API
 curl -X POST "http://localhost:3000/api/auth/api-keys" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Production API Key",
-    "usage_limit_per_hour": 1000,
-    "usage_limit_per_day": 10000,
-    "usage_limit_per_month": 100000
-  }'
+  -d '{"name": "My API Key", "description": "For my application"}'
 
-# List your API keys
-curl -X GET "http://localhost:3000/api/auth/api-keys" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-## 🎯 API Usage
-
-### Text Generation
-
-```bash
-# With JWT Token
+# 2. Use API key for requests
 curl -X POST "http://localhost:3000/api/generate" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Write a Python function to calculate fibonacci numbers",
-    "model": "llama3:8b",
-    "stream": false
-  }'
-
-# With API Key
-curl -X POST "http://localhost:3000/api/generate" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Explain quantum computing",
-    "model": "llama3:8b",
-    "stream": true
-  }'
+  -d '{"prompt": "Write a Python function", "model": "llama3:8b"}'
 ```
 
-### Chat Completion
+### **Key API Endpoints**
 
-```bash
-curl -X POST "http://localhost:3000/api/chat" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "messages": [
-      {"role": "system", "content": "You are a helpful coding assistant"},
-      {"role": "user", "content": "How do I implement authentication in FastAPI?"}
-    ],
-    "model": "llama3:8b",
-    "stream": false
-  }'
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/` | GET | Health check | No |
+| `/api/auth/login` | POST | User login | No |
+| `/api/auth/register` | POST | User registration | No |
+| `/api/auth/me` | GET | Current user info | Yes |
+| `/api/auth/api-keys` | POST/GET | Manage API keys | Yes |
+| `/api/generate` | POST | Text generation | Yes |
+| `/api/chat` | POST | Chat completion | Yes |
+| `/api/models` | GET | List models | Yes |
+| `/docs` | GET | API documentation | No |
+
+## 👥 User Roles & Permissions
+
+| Role | Permissions |
+|------|-------------|
+| **Admin** | Full system access, user management, all API endpoints |
+| **Developer** | API access, model management, usage analytics |
+| **User** | Basic API access, text generation, chat |
+| **Read-Only** | View-only access, no generation capabilities |
+
+## 🔧 Advanced Configuration
+
+### **Database Options**
+
+#### SQLite (Default - Recommended for Development)
+```env
+DATABASE_URL=sqlite:///./ollama_api.db
 ```
 
-### Model Management
-
-```bash
-# List available models
-curl -X GET "http://localhost:3000/api/models" \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
-# Download a model (requires developer+ role)
-curl -X POST "http://localhost:3000/api/models/download" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "codellama:7b"}'
-
-# Get model information
-curl -X GET "http://localhost:3000/api/models/llama3:8b" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+#### PostgreSQL (Recommended for Production)
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/ollama_api
 ```
 
-## 👥 Role-Based Access Control
-
-### Role Hierarchy
-- **Admin**: Full system access, user management, all model operations
-- **Developer**: Model management, full API access, API key management
-- **User**: Basic API usage, limited model operations, own API key management
-- **Read-Only**: View-only access, cannot modify anything
-
-### Permission Matrix
-| Endpoint | Admin | Developer | User | Read-Only |
-|----------|-------|-----------|------|-----------|
-| Text Generation | ✅ | ✅ | ✅ | ❌ |
-| Chat Completion | ✅ | ✅ | ✅ | ❌ |
-| List Models | ✅ | ✅ | ✅ | ✅ |
-| Download Models | ✅ | ✅ | ✅ | ❌ |
-| Delete Models | ✅ | ✅ | ❌ | ❌ |
-| User Management | ✅ | ❌ | ❌ | ❌ |
-| View All Users | ✅ | ❌ | ❌ | ❌ |
-| API Key Management | ✅ | ✅ | ✅ | ✅ |
-| Usage Analytics | ✅ | ✅ | ✅ | ✅ |
-
-## 📊 Usage Analytics & Monitoring
-
-### View Your Usage Statistics
-
-```bash
-# Get your usage stats
-curl -X GET "http://localhost:3000/api/auth/usage/stats" \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
-# Get generation-specific usage
-curl -X GET "http://localhost:3000/api/generate/usage" \
-  -H "Authorization: Bearer YOUR_TOKEN"
-
-# Get chat-specific usage
-curl -X GET "http://localhost:3000/api/chat/usage" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+### **Rate Limiting**
+```env
+RATE_LIMIT_ENABLED=True
+RATE_LIMIT_PER_MINUTE=60
+RATE_LIMIT_PER_HOUR=1000
 ```
 
-### Rate Limits
+### **Security Settings**
+```env
+PASSWORD_MIN_LENGTH=8
+PASSWORD_REQUIRE_UPPERCASE=True
+PASSWORD_REQUIRE_LOWERCASE=True
+PASSWORD_REQUIRE_DIGITS=True
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
 
-Default rate limits by role:
-- **Admin**: Unlimited
-- **Developer**: 10,000 requests/day, 10 concurrent
-- **User**: 1,000 requests/day, 5 concurrent  
-- **Read-Only**: 100 requests/day, 2 concurrent
+### **Ollama Configuration**
+```env
+OLLAMA_API_BASE_URL=http://localhost:11434
+DEFAULT_MODEL=llama3:8b
+REQUEST_TIMEOUT=60.0
+```
 
-API keys can have custom limits set during creation.
+## 🛠️ Development
 
-## 🧪 Testing
+### **Project Structure**
+```
+ollama-api-wrapper/
+├── frontend/                 # Web interface
+│   ├── index.html           # Main dashboard
+│   ├── css/                 # Styling
+│   └── js/                  # Frontend logic
+├── auth/                    # Authentication system
+│   ├── router.py           # Auth endpoints
+│   ├── services.py         # Business logic
+│   └── schemas.py          # Data models
+├── database/               # Database layer
+│   ├── models.py           # SQLAlchemy models
+│   └── connection.py       # DB connection
+├── routers/                # API endpoints
+├── migrations/             # Database migrations
+├── app.py                  # Main application
+└── config.py              # Configuration
+```
 
-### Run the Test Suite
+### **Adding New Features**
+
+1. **New API Endpoint**:
+   - Add router in `routers/`
+   - Include in `app.py`
+   - Add authentication decorator
+
+2. **Database Changes**:
+   - Update `database/models.py`
+   - Create migration: `alembic revision --autogenerate -m "Description"`
+   - Apply: `alembic upgrade head`
+
+3. **Frontend Updates**:
+   - Update relevant files in `frontend/`
+   - Test in browser at `http://localhost:8080`
+
+### **Testing**
 
 ```bash
 # Install test dependencies
 pip install pytest pytest-asyncio
 
-# Create test database
-createdb ollama_api_test
-
-# Run all tests
-pytest
-
-# Run specific test categories
-pytest tests/test_auth.py -v
-pytest tests/test_protected_endpoints.py -v
+# Run tests
+pytest tests/ -v
 
 # Run with coverage
-pytest --cov=. --cov-report=html
+pytest --cov=. tests/
 ```
 
-### Test Authentication Flow
+## 🚀 Production Deployment
 
-```bash
-# Test user registration
-curl -X POST "http://localhost:3000/api/auth/register" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "testuser",
-    "email": "test@example.com", 
-    "password": "TestPass123"
-  }'
+### **Security Checklist**
+- [ ] Change default admin credentials
+- [ ] Generate new SECRET_KEY
+- [ ] Use PostgreSQL instead of SQLite
+- [ ] Enable HTTPS
+- [ ] Configure firewall rules
+- [ ] Set up monitoring
+- [ ] Regular backups
 
-# Test login
-curl -X POST "http://localhost:3000/api/auth/login" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=testuser&password=TestPass123"
+### **Environment Variables for Production**
+```env
+DEBUG=False
+SECRET_KEY=your_super_secure_secret_key
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+CORS_ORIGINS=["https://yourdomain.com"]
+LOG_LEVEL=INFO
 ```
 
-## 🔧 Development
-
-### Project Structure
-
-```
-ollama-api-wrapper/
-├── auth/                    # Authentication module
-│   ├── dependencies.py     # FastAPI auth dependencies  
-│   ├── router.py           # Auth endpoints
-│   ├── schemas.py          # Pydantic models
-│   ├── services.py         # Business logic
-│   └── utils.py            # Auth utilities
-├── database/               # Database layer
-│   ├── connection.py       # DB connection setup
-│   └── models.py           # SQLAlchemy models
-├── middleware/             # Custom middleware
-│   ├── auth_middleware.py  # Authentication middleware
-│   └── usage_tracking.py   # Usage tracking middleware
-├── routers/                # Protected API endpoints
-│   ├── chat.py            # Chat completion (protected)
-│   ├── generate.py        # Text generation (protected)
-│   └── models.py          # Model management (protected)
-├── services/               # Business logic
-│   └── ollama_service.py   # Ollama API integration
-├── tests/                  # Test suite
-│   ├── test_auth.py       # Authentication tests
-│   └── test_protected_endpoints.py
-├── migrations/             # Database migrations
-├── app.py                 # Main application
-├── config.py              # Configuration
-└── requirements.txt       # Dependencies
-```
-
-### Adding New Features
-
-1. **Create new router** in `routers/`
-2. **Add authentication** using dependencies from `auth.dependencies`
-3. **Implement business logic** in `services/`
-4. **Add tests** in `tests/`
-5. **Update documentation**
-
-### Database Migrations
-
-```bash
-# Create new migration
-alembic revision --autogenerate -m "Add new feature"
-
-# Apply migrations
-alembic upgrade head
-
-# Rollback migration  
-alembic downgrade -1
-```
-
-## 🚀 Deployment
-
-### Docker Deployment
-
+### **Docker Deployment**
 ```dockerfile
-# Dockerfile
 FROM python:3.11-slim
-
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
 COPY . .
 EXPOSE 3000
-
 CMD ["gunicorn", "app:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:3000"]
 ```
 
+## 🔍 Troubleshooting
+
+### **Common Issues**
+
+#### **"Ollama connection failed"**
+- ✅ Ensure Ollama is running: `ollama serve`
+- ✅ Check if model is downloaded: `ollama list`
+- ✅ Verify Ollama URL in `.env`
+
+#### **"Database connection error"**
+- ✅ Check database URL in `.env`
+- ✅ Run migrations: `alembic upgrade head`
+- ✅ Ensure database permissions
+
+#### **"Authentication failed"**
+- ✅ Check username/password
+- ✅ Verify admin user was created
+- ✅ Check token expiration
+
+#### **"CORS errors in browser"**
+- ✅ Use local server: `python -m http.server 8080`
+- ✅ Don't open HTML file directly
+- ✅ Check CORS settings in `.env`
+
+### **Debugging**
+
 ```bash
-# Build and run
-docker build -t ollama-api-auth .
-docker run -p 3000:3000 --env-file .env ollama-api-auth
+# Check API health
+curl http://localhost:3000/
+
+# View logs
+tail -f logs/app.log
+
+# Check database
+python -c "from database.models import User; print(User.query.all())"
 ```
-
-### Production Checklist
-
-- [ ] Change default admin password
-- [ ] Set strong SECRET_KEY
-- [ ] Configure proper database credentials
-- [ ] Set up SSL/TLS (HTTPS)
-- [ ] Configure rate limiting
-- [ ] Set up monitoring and logging
-- [ ] Configure backup strategy
-- [ ] Set proper CORS origins
-- [ ] Review security headers
 
 ## 📚 API Documentation
 
-### Interactive Documentation
-
-- **Swagger UI**: `http://localhost:3000/docs`
+- **Interactive Docs**: `http://localhost:3000/docs`
+- **OpenAPI Spec**: `http://localhost:3000/openapi.json`
 - **ReDoc**: `http://localhost:3000/redoc`
-
-### Health Checks
-
-```bash
-# Basic health check
-curl http://localhost:3000/health
-
-# Detailed API info
-curl http://localhost:3000/api/info
-```
-
-## 🔒 Security Best Practices
-
-### For Administrators
-1. **Change default credentials** immediately
-2. **Use strong, unique passwords** for all accounts
-3. **Regularly rotate API keys** and monitor usage
-4. **Enable rate limiting** to prevent abuse
-5. **Monitor usage logs** for suspicious activity
-6. **Keep the system updated** with security patches
-
-### For Developers
-1. **Store API keys securely** (use environment variables)
-2. **Never commit credentials** to version control
-3. **Use HTTPS** in production
-4. **Implement proper error handling** in your applications
-5. **Monitor your usage** to stay within limits
-
-### For Users
-1. **Use strong passwords** for your account
-2. **Don't share API keys** with others
-3. **Rotate API keys** periodically
-4. **Monitor your usage** to avoid unexpected charges
-5. **Report suspicious activity** to administrators
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Authentication Failed**
-```bash
-# Check if user exists and password is correct
-curl -X POST "http://localhost:3000/api/auth/login" -d "username=user&password=pass"
-
-# Verify token is not expired
-# Check server logs for detailed error messages
-```
-
-**Rate Limit Exceeded**
-```bash
-# Check your current usage
-curl -X GET "http://localhost:3000/api/auth/usage/stats" -H "Authorization: Bearer YOUR_TOKEN"
-
-# Wait for rate limit reset or contact admin for limit increase
-```
-
-**Database Connection Error**
-```bash
-# Check database is running
-docker-compose ps
-
-# Verify connection string in .env
-# Check database logs for errors
-```
-
-**Model Not Found**
-```bash
-# List available models
-curl -X GET "http://localhost:3000/api/models" -H "Authorization: Bearer YOUR_TOKEN"
-
-# Download the model if needed
-curl -X POST "http://localhost:3000/api/models/download" -H "Authorization: Bearer YOUR_TOKEN" -d '{"name": "model_name"}'
-```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Setup
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run pre-commit hooks
-pre-commit install
-
-# Run tests before committing
-pytest
-
-# Check code formatting
-black . --check
-flake8 .
-```
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes
+4. Add tests for new features
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- [FastAPI](https://fastapi.tiangolo.com/) for the excellent web framework
-- [Ollama](https://ollama.ai/) for the local LLM API
-- [SQLAlchemy](https://sqlalchemy.org/) for database ORM
-- [Pydantic](https://pydantic-docs.helpmanual.io/) for data validation
+- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
+- **Documentation**: [Wiki](https://github.com/your-repo/wiki)
 
-## 📞 Support
+## 🎉 Acknowledgments
 
-- **Documentation**: Check the `/docs` endpoint for interactive API documentation
-- **Issues**: Open an issue on GitHub for bug reports or feature requests
-- **Discussions**: Use GitHub Discussions for questions and community support
+- **Ollama**: For the amazing local AI model runtime
+- **FastAPI**: For the excellent web framework
+- **SQLAlchemy**: For robust database ORM
+- **Community**: For feedback and contributions
 
 ---
 
-**⚡ Ready to secure your Ollama API?** Follow the installation guide above and start building with confidence!
+**Happy Coding! 🚀**
