@@ -57,4 +57,20 @@ async def chat_completion(
             request.model, 
             request.options
         )
-        return JSONResponse(response)
+
+        # Ensure we parse and combine multiple JSON lines (if present)
+        if isinstance(response, str):
+            lines = response.strip().splitlines()
+            contents = []
+            for line in lines:
+                try:
+                    parsed = json.loads(line)
+                    if isinstance(parsed, dict) and "content" in parsed:
+                        contents.append(parsed["content"])
+                except json.JSONDecodeError:
+                    continue
+
+            merged = "".join(contents)
+            return JSONResponse({"content": merged})
+        else:
+            return JSONResponse(response)
